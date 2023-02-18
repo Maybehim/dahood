@@ -1,0 +1,657 @@
+repeat
+    wait()
+until game:IsLoaded() and game.Players.LocalPlayer.Character:FindFirstChild("FULLY_LOADED_CHAR")
+local timetoload = tick()
+
+-- // Variables
+local Players = game:GetService('Players')
+local Client = Players.LocalPlayer
+local CoreGui = game:GetService('CoreGui')
+
+-- // Functions
+function getHealth(target)
+    if (target) then
+        return tonumber(Players[target].Character.Humanoid.Health)
+    else
+        return 0
+    end
+end
+
+function getArmor(target)
+    if (target) then
+        return tonumber(Players[target].Character.BodyEffects.Armor.Value)
+    else
+        return 0
+    end
+end
+
+function getDistance(target)
+    if (target) then
+        return tonumber((Client.Character.HumanoidRootPart.Position - target.Character.HumanoidRootPart.Position).magnitude)
+    else
+        return 100
+    end
+end
+
+function isWinning(target)
+    if (target) then
+        -- // Health
+        local clientHealth = math.floor(getHealth(tostring(Client.Name)))
+        local tHealth = math.floor(getHealth(target))
+        
+        -- // If the target has more health than our client
+        if (clientHealth < tHealth) then
+            return true
+        else
+            return false
+        end
+    else
+        return true
+    end
+end
+
+-- // Design
+local healthGUI = Instance.new("ScreenGui")
+local Body = Instance.new("Frame")
+local TopBar = Instance.new("Frame")
+local topBarCorner = Instance.new("UICorner")
+local targetHeadshot = Instance.new("ImageLabel")
+local targetName = Instance.new("TextLabel")
+local healthBar = Instance.new("Frame")
+local healthBarCorner = Instance.new("UICorner")
+local healthBarBG = Instance.new("Frame")
+local healthBarBGCorner = Instance.new("UICorner")
+local healthIcon = Instance.new("ImageLabel")
+local healthText = Instance.new("TextLabel")
+local bodyCorner = Instance.new("UICorner")
+local armorBar = Instance.new("Frame")
+local armorBarCorner = Instance.new("UICorner")
+local armorBarBG = Instance.new("Frame")
+local armorBGCorner = Instance.new("UICorner")
+local armorText = Instance.new("TextLabel")
+local armorIcon = Instance.new("ImageLabel")
+local Distance = Instance.new("TextLabel")
+local Winning = Instance.new("TextLabel")
+
+-- // Design functions
+function setTargetHUDColor(color)
+    armorBarBG.BackgroundColor3 = Color3.fromRGB(color)
+    TopBar.BackgroundColor3 = Color3.fromRGB(color)
+    healthBarBG.BackgroundColor3 = Color3.fromRGB(color)
+end
+
+-- // Rest of the UI design
+healthGUI.Name = "healthGUI"
+healthGUI.Parent = CoreGui
+
+Body.Name = "Body"
+Body.Parent = healthGUI
+Body.AnchorPoint = Vector2.new(0.5, 0.5)
+Body.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Body.BorderSizePixel = 0
+Body.ClipsDescendants = true
+Body.Position = UDim2.new(0.5, 0, 0.798113227, 0)
+Body.Size = UDim2.new(0, 240, 0, 131)
+Body.Visible = false
+
+TopBar.Name = "TopBar"
+TopBar.Parent = Body
+TopBar.AnchorPoint = Vector2.new(0.5, 0.5)
+TopBar.BorderSizePixel = 0
+TopBar.Position = UDim2.new(0.5, 0, 0.0199999996, 0)
+TopBar.Size = UDim2.new(1, 5, 0, 6)
+
+topBarCorner.CornerRadius = UDim.new(0, 5)
+topBarCorner.Name = "topBarCorner"
+topBarCorner.Parent = TopBar
+
+targetHeadshot.Name = "targetHeadshot"
+targetHeadshot.Parent = Body
+targetHeadshot.AnchorPoint = Vector2.new(0.5, 0.5)
+targetHeadshot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+targetHeadshot.BackgroundTransparency = 1
+targetHeadshot.BorderSizePixel = 0
+targetHeadshot.Position = UDim2.new(0.25, 0, 0.519999981, 0)
+targetHeadshot.Size = UDim2.new(0, 100, 0, 100)
+targetHeadshot.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+
+targetName.Name = "targetName"
+targetName.Parent = Body
+targetName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+targetName.BackgroundTransparency = 1.000
+targetName.BorderSizePixel = 0
+targetName.Position = UDim2.new(0.491666675, 0, 0.137404576, 0)
+targetName.Size = UDim2.new(0, 113, 0, 12)
+targetName.Font = Enum.Font.Roboto
+targetName.Text = "1fzn"
+targetName.TextColor3 = Color3.fromRGB(255, 255, 255)
+targetName.TextSize = 14.000
+targetName.TextXAlignment = Enum.TextXAlignment.Left
+targetName.TextScaled = true
+
+healthBar.Name = "healthBar"
+healthBar.Parent = Body
+healthBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+healthBar.BorderSizePixel = 0
+healthBar.Position = UDim2.new(0.491666675, 0, 0.290076345, 0)
+healthBar.Size = UDim2.new(0, 113, 0, 17)
+
+healthBarCorner.CornerRadius = UDim.new(0, 2)
+healthBarCorner.Name = "healthBarCorner"
+healthBarCorner.Parent = healthBar
+
+healthBarBG.Name = "healthBarBG"
+healthBarBG.Parent = healthBar
+healthBarBG.BorderSizePixel = 0
+healthBarBG.Size = UDim2.new(1, 0, 0, 17)
+
+healthBarBGCorner.CornerRadius = UDim.new(0, 3)
+healthBarBGCorner.Name = "healthBarBGCorner"
+healthBarBGCorner.Parent = healthBarBG
+
+healthIcon.Name = "healthIcon"
+healthIcon.Parent = healthBar
+healthIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+healthIcon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+healthIcon.BackgroundTransparency = 1.000
+healthIcon.BorderSizePixel = 0
+healthIcon.Position = UDim2.new(0.0799999982, 0, 0.5, 0)
+healthIcon.Size = UDim2.new(0, 12, 0, 13)
+healthIcon.Image = "rbxassetid://3192484653"
+
+healthText.Name = "healthText"
+healthText.Parent = healthBar
+healthText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+healthText.BackgroundTransparency = 1.000
+healthText.BorderSizePixel = 0
+healthText.Size = UDim2.new(0, 113, 0, 17)
+healthText.Font = Enum.Font.Roboto
+healthText.Text = "100"
+healthText.TextColor3 = Color3.fromRGB(255, 255, 255)
+healthText.TextSize = 14.000
+
+bodyCorner.CornerRadius = UDim.new(0, 3)
+bodyCorner.Name = "bodyCorner"
+bodyCorner.Parent = Body
+
+armorBar.Name = "armorBar"
+armorBar.Parent = Body
+armorBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+armorBar.BorderSizePixel = 0
+armorBar.Position = UDim2.new(0.492000014, 0, 0.449999988, 0)
+armorBar.Size = UDim2.new(0, 113, 0, 17)
+
+armorBarCorner.CornerRadius = UDim.new(0, 2)
+armorBarCorner.Name = "armorBarCorner"
+armorBarCorner.Parent = armorBar
+
+armorBarBG.Name = "armorBarBG"
+armorBarBG.Parent = armorBar
+armorBarBG.BorderSizePixel = 0
+armorBarBG.Size = UDim2.new(0.513274312, 0, 0, 17)
+
+armorBGCorner.CornerRadius = UDim.new(0, 3)
+armorBGCorner.Name = "armorBGCorner"
+armorBGCorner.Parent = armorBarBG
+
+armorText.Name = "armorText"
+armorText.Parent = armorBar
+armorText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+armorText.BackgroundTransparency = 1.000
+armorText.BorderSizePixel = 0
+armorText.Size = UDim2.new(0, 113, 0, 17)
+armorText.Font = Enum.Font.Roboto
+armorText.Text = "50"
+armorText.TextColor3 = Color3.fromRGB(255, 255, 255)
+armorText.TextSize = 14.000
+
+armorIcon.Name = "armorIcon"
+armorIcon.Parent = armorBar
+armorIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+armorIcon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+armorIcon.BackgroundTransparency = 1.000
+armorIcon.BorderSizePixel = 0
+armorIcon.Position = UDim2.new(0.0799999982, 0, 0.5, 0)
+armorIcon.Size = UDim2.new(0, 12, 0, 13)
+armorIcon.Image = "rbxassetid://7169354142"
+
+Distance.Name = "Distance"
+Distance.Parent = Body
+Distance.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Distance.BackgroundTransparency = 1.000
+Distance.BorderSizePixel = 0
+Distance.Position = UDim2.new(0.491666675, 0, 0.78, 0)
+Distance.Size = UDim2.new(0, 110, 0, 17)
+Distance.Font = Enum.Font.Roboto
+Distance.Text = "Distance: 98 studs"
+Distance.TextColor3 = Color3.fromRGB(255, 255, 255)
+Distance.TextSize = 13.000
+Distance.TextXAlignment = Enum.TextXAlignment.Left
+
+Winning.Name = "Winning"
+Winning.Parent = Body
+Winning.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Winning.BackgroundTransparency = 1.000
+Winning.BorderSizePixel = 0
+Winning.Position = UDim2.new(0.491666675, 0, 0.620000005, 0)
+Winning.Size = UDim2.new(0, 110, 0, 17)
+Winning.Font = Enum.Font.Roboto
+Winning.Text = "Winning: true"
+Winning.TextColor3 = Color3.fromRGB(255, 255, 255)
+Winning.TextSize = 13.000
+Winning.TextXAlignment = Enum.TextXAlignment.Left
+_G.ArmorBAR = Color3.fromRGB(255, 0, 4)
+ _G.TOPBAR =Color3.fromRGB(255, 0, 4)
+_G.healthBarBG = Color3.fromRGB(255, 0, 4)
+armorBarBG.BackgroundColor3 = _G.ArmorBAR
+
+TopBar.BackgroundColor3 = _G.TOPBAR
+
+healthBarBG.BackgroundColor3 = _G.healthBarBG
+
+local Skins = {
+    ["[Revolver]"] = {
+        ["Battleworn Green"] = {
+            TextureID = "rbxassetid://8174665752",
+            Rarity = "Common"
+        },
+        ["Battleworn Lilac"] = {
+            TextureID = "rbxassetid://8175141275",
+            Rarity = "Common"
+        },
+        ["Battleworn Red"] = {
+            TextureID = "rbxassetid://8175126370",
+            Rarity = "Common"
+        },
+        ["Battleworn Yellowish"] = {
+            TextureID = "rbxassetid://8175111007",
+            Rarity = "Common"
+        },
+        ["Battleworn Purple"] = {
+            TextureID = "rbxassetid://8174703251",
+            Rarity = "Common"
+        },
+        ["Battleworn Pink"] = {
+            TextureID = "rbxassetid://8174725170",
+            Rarity = "Common"
+        },
+        Danger = {
+            TextureID = "rbxassetid://8174602579",
+            Rarity = "Rare"
+        },
+        ["Black & White"] = {
+            TextureID = "rbxassetid://8174185468",
+            Rarity = "Rare"
+        },
+        Future = {
+            TextureID = "rbxassetid://8174245185",
+            Rarity = "Rare"
+        },
+        Icey = {
+            TextureID = "rbxassetid://8174472966",
+            Rarity = "Epic"
+        },
+        Biohazard = {
+            TextureID = "rbxassetid://8174086219",
+            Rarity = "Epic"
+        },
+        ["Red Death"] = {
+            TextureID = "rbxassetid://8173928665",
+            Rarity = "Legendary"
+        },
+        ["Gold Glory"] = {
+            TextureID = "rbxassetid://8173955378",
+            Rarity = "Legendary"
+        }
+    },
+    ["[DrumGun]"] = {
+        ["Battleworn Green"] = {
+            TextureID = "rbxassetid://8185356861",
+            Rarity = "Common"
+        },
+        ["Battleworn Silver"] = {
+            TextureID = "rbxassetid://8185395568",
+            Rarity = "Common"
+        },
+        ["Battleworn Red"] = {
+            TextureID = "rbxassetid://8185380857",
+            Rarity = "Common"
+        },
+        ["Battleworn Orange"] = {
+            TextureID = "rbxassetid://8185410368",
+            Rarity = "Common"
+        },
+        ["Battleworn Purple"] = {
+            TextureID = "rbxassetid://8185370548",
+            Rarity = "Common"
+        },
+        ["Battleworn Pink"] = {
+            TextureID = "rbxassetid://8200161894",
+            Rarity = "Common"
+        },
+        Danger = {
+            TextureID = "rbxassetid://8185515967",
+            Rarity = "Rare"
+        },
+        ["Black & White"] = {
+            TextureID = "rbxassetid://8185562852",
+            Rarity = "Rare"
+        },
+        Future = {
+            TextureID = "rbxassetid://8185721916",
+            Rarity = "Rare"
+        },
+        Icey = {
+            TextureID = "rbxassetid://8185793923",
+            Rarity = "Epic"
+        },
+        Biohazard = {
+            TextureID = "rbxassetid://8185845811",
+            Rarity = "Epic"
+        },
+        ["Red Death"] = {
+            TextureID = "rbxassetid://8186385983",
+            Rarity = "Legendary"
+        },
+        ["Gold Glory"] = {
+            TextureID = "rbxassetid://8186168230",
+            Rarity = "Legendary"
+        }
+    },
+    ["[SMG]"] = {
+        ["Battleworn Green"] = {
+            TextureID = "rbxassetid://8199419655",
+            Rarity = "Common"
+        },
+        ["Battleworn Silver"] = {
+            TextureID = "rbxassetid://8199458294",
+            Rarity = "Common"
+        },
+        ["Battleworn Red"] = {
+            TextureID = "rbxassetid://8199451863",
+            Rarity = "Common"
+        },
+        ["Battleworn Orange"] = {
+            TextureID = "rbxassetid://8199473055",
+            Rarity = "Common"
+        },
+        ["Battleworn Purple"] = {
+            TextureID = "rbxassetid://8199431005",
+            Rarity = "Common"
+        },
+        ["Battleworn Pink"] = {
+            TextureID = "rbxassetid://8199477007",
+            Rarity = "Common"
+        },
+        Danger = {
+            TextureID = "rbxassetid://8199481436",
+            Rarity = "Rare"
+        },
+        ["Black & White"] = {
+            TextureID = "rbxassetid://8199502936",
+            Rarity = "Rare"
+        },
+        Future = {
+            TextureID = "rbxassetid://8199514095",
+            Rarity = "Rare"
+        },
+        Icey = {
+            TextureID = "rbxassetid://8199653818",
+            Rarity = "Epic"
+        },
+        Biohazard = {
+            TextureID = "rbxassetid://8199866150",
+            Rarity = "Epic"
+        },
+        ["Red Death"] = {
+            TextureID = "rbxassetid://8199875638",
+            Rarity = "Legendary"
+        },
+        ["Gold Glory"] = {
+            TextureID = "rbxassetid://8199883519",
+            Rarity = "Legendary"
+        }
+    },
+    ["[Shotgun]"] = {
+        ["Battleworn Green"] = {
+            TextureID = "rbxassetid://8200212723",
+            Rarity = "Common"
+        },
+        ["Battleworn Red"] = {
+            TextureID = "rbxassetid://8200231458",
+            Rarity = "Common"
+        },
+        ["Battleworn Orange"] = {
+            TextureID = "rbxassetid://8200235920",
+            Rarity = "Common"
+        },
+        ["Battleworn Purple"] = {
+            TextureID = "rbxassetid://8200227785",
+            Rarity = "Common"
+        },
+        ["Battleworn Pink"] = {
+            TextureID = "rbxassetid://8200239202",
+            Rarity = "Common"
+        },
+        Danger = {
+            TextureID = "rbxassetid://8200263229",
+            Rarity = "Rare"
+        },
+        ["Black & White"] = {
+            TextureID = "rbxassetid://8200281207",
+            Rarity = "Rare"
+        },
+        Future = {
+            TextureID = "rbxassetid://8200452630",
+            Rarity = "Rare"
+        },
+        Icey = {
+            TextureID = "rbxassetid://8200567741",
+            Rarity = "Epic"
+        },
+        Biohazard = {
+            TextureID = "rbxassetid://8200611946",
+            Rarity = "Epic"
+        },
+        ["Red Death"] = {
+            TextureID = "rbxassetid://8200647420",
+            Rarity = "Legendary"
+        },
+        ["Gold Glory"] = {
+            TextureID = "rbxassetid://8200657428",
+            Rarity = "Legendary"
+        }
+    },
+    ["[TacticalShotgun]"] = {
+        ["Battleworn Green"] = {
+            TextureID = "rbxassetid://9202807512",
+            Rarity = "Common"
+        },
+        ["Battleworn Red"] = {
+            TextureID = "rbxassetid://9202860371",
+            Rarity = "Common"
+        },
+        ["Battleworn Orange"] = {
+            TextureID = "rbxassetid://9202877794",
+            Rarity = "Common"
+        },
+        ["Battleworn Purple"] = {
+            TextureID = "rbxassetid://9202833643",
+            Rarity = "Common"
+        },
+        ["Battleworn Pink"] = {
+            TextureID = "rbxassetid://9202903532",
+            Rarity = "Common"
+        },
+        Danger = {
+            TextureID = "rbxassetid://9203188586",
+            Rarity = "Rare"
+        },
+        ["Black & White"] = {
+            TextureID = "rbxassetid://9203220557",
+            Rarity = "Rare"
+        },
+        Future = {
+            TextureID = "rbxassetid://9203241308",
+            Rarity = "Rare"
+        },
+        Icey = {
+            TextureID = "rbxassetid://9203412138",
+            Rarity = "Epic"
+        },
+        Biohazard = {
+            TextureID = "rbxassetid://9203513612",
+            Rarity = "Epic"
+        },
+        ["Red Death"] = {
+            TextureID = "rbxassetid://9203641766",
+            Rarity = "Legendary"
+        },
+        ["Gold Glory"] = {
+            TextureID = "rbxassetid://9203647967",
+            Rarity = "Legendary"
+        }
+    },
+    ["[RPG]"] = {
+        ["Battleworn Green"] = {
+            TextureID = "rbxassetid://8200732479",
+            Rarity = "Common"
+        },
+        ["Battleworn Red"] = {
+            TextureID = "rbxassetid://8200751938",
+            Rarity = "Common"
+        },
+        ["Battleworn Orange"] = {
+            TextureID = "rbxassetid://8200757388",
+            Rarity = "Common"
+        },
+        ["Battleworn Purple"] = {
+            TextureID = "rbxassetid://8200745198",
+            Rarity = "Common"
+        },
+        ["Battleworn Pink"] = {
+            TextureID = "rbxassetid://8200764100",
+            Rarity = "Common"
+        },
+        Danger = {
+            TextureID = "rbxassetid://8200822253",
+            Rarity = "Rare"
+        },
+        ["Black & White"] = {
+            TextureID = "rbxassetid://8200850424",
+            Rarity = "Rare"
+        },
+        Future = {
+            TextureID = "rbxassetid://8200866435",
+            Rarity = "Rare"
+        },
+        Icey = {
+            TextureID = "rbxassetid://8200890494",
+            Rarity = "Epic"
+        },
+        Biohazard = {
+            TextureID = "rbxassetid://8201028034",
+            Rarity = "Epic"
+        },
+        ["Red Death"] = {
+            TextureID = "rbxassetid://8201055935",
+            Rarity = "Legendary"
+        },
+        ["Gold Glory"] = {
+            TextureID = "rbxassetid://8201059812",
+            Rarity = "Legendary"
+        }
+    },
+    ["[P90]"] = {
+        ["Battleworn Green"] = {
+            TextureID = "rbxassetid://8205069485",
+            Rarity = "Common"
+        },
+        ["Battleworn Red"] = {
+            TextureID = "rbxassetid://8205089535",
+            Rarity = "Common"
+        },
+        ["Battleworn Orange"] = {
+            TextureID = "rbxassetid://8205123590",
+            Rarity = "Common"
+        },
+        ["Battleworn Purple"] = {
+            TextureID = "rbxassetid://8205076879",
+            Rarity = "Common"
+        },
+        ["Battleworn Pink"] = {
+            TextureID = "rbxassetid://8205144857",
+            Rarity = "Common"
+        },
+        Danger = {
+            TextureID = "rbxassetid://8205219107",
+            Rarity = "Rare"
+        },
+        ["Black & White"] = {
+            TextureID = "rbxassetid://8205257625",
+            Rarity = "Rare"
+        },
+        Future = {
+            TextureID = "rbxassetid://8205265666",
+            Rarity = "Rare"
+        },
+        Icey = {
+            TextureID = "rbxassetid://8205325456",
+            Rarity = "Epic"
+        },
+        Biohazard = {
+            TextureID = "rbxassetid://8205367433",
+            Rarity = "Epic"
+        },
+        ["Red Death"] = {
+            TextureID = "rbxassetid://8205381104",
+            Rarity = "Legendary"
+        },
+        ["Gold Glory"] = {
+            TextureID = "rbxassetid://8205397990",
+            Rarity = "Legendary"
+        }
+    },
+    ["[LMG]"] = {
+        ["Battleworn Green"] = {
+            TextureID = "rbxassetid://8205498477",
+            Rarity = "Common"
+        },
+        ["Battleworn Red"] = {
+            TextureID = "rbxassetid://8205510598",
+            Rarity = "Common"
+        },
+        ["Battleworn Orange"] = {
+            TextureID = "rbxassetid://8205517033",
+            Rarity = "Common"
+        },
+        ["Battleworn Purple"] = {
+            TextureID = "rbxassetid://8205505332",
+            Rarity = "Common"
+        },
+        ["Battleworn Pink"] = {
+            TextureID = "rbxassetid://8205523035",
+            Rarity = "Common"
+        },
+        Danger = {
+            TextureID = "rbxassetid://8205558639",
+            Rarity = "Rare"
+        },
+        ["Black & White"] = {
+            TextureID = "rbxassetid://8205575208",
+            Rarity = "Rare"
+        },
+        Future = {
+            TextureID = "rbxassetid://8205585472",
+            Rarity = "Rare"
+        },
+        Icey = {
+            TextureID = "rbxassetid://8205620131",
+            Rarity = "Epic"
+        },
+        Biohazard = {
+            TextureID = "rbxassetid://8205697183",
+            Rarity = "Epic"
+        },
+        ["Red Death"] = {
+            TextureID = "rbxassetid://82057133
