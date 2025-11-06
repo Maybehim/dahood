@@ -355,6 +355,12 @@ export class RoomManager extends EventEmitter {
     const category = packWords.category;
     const word = packWords.word.word;
     const playersInRound = this.shuffle(room.players.filter((p) => p.connected));
+    if (playersInRound.length < room.settings.minPlayers) {
+      room.phase = 'LOBBY';
+      room.round = null;
+      this.emitUpdate(room, 'round:awaiting-players');
+      return;
+    }
     const imposterIndex = Math.floor(Math.random() * playersInRound.length);
     const imposterId = playersInRound[imposterIndex].id;
     room.players.forEach((p) => {
@@ -482,7 +488,9 @@ export class RoomManager extends EventEmitter {
   }
 
   private allVotesPresent(round: RoundState): boolean {
-    return round.votes.every((vote) => vote.suspectId !== undefined);
+    return round.turnOrder.every((playerId) =>
+      round.votes.some((vote) => vote.voterId === playerId && vote.suspectId !== undefined)
+    );
   }
 
   private selectWords(room: RoomState): { word: WordEntry; category?: string } {
