@@ -1,0 +1,23 @@
+{
+  "name": "word-imposter-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Word Imposter real-time party game",
+  "license": "MIT",
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "npm --workspace client run build",
+    "build:server": "npm --workspace server run build",
+    "dev": "concurrently \"npm --workspace server run dev\" \"npm --workspace client run dev\"",
+    "lint": "npm run lint:client && npm run lint:server",
+    "lint:client": "npm --workspace client run lint",
+    "lint:server": "npm --workspace server run lint",
+    "test": "npm run test:client && npm run test:server",
+    "test:client": "npm --workspace client run test",
+    "test:server": "npm --workspace server run test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
